@@ -8,6 +8,7 @@ extern crate clap;
 extern crate reqwest;
 extern crate toml;
 extern crate webbrowser;
+extern crate directories;
 
 mod app;
 mod credentials;
@@ -21,7 +22,7 @@ use app::AOCApp;
 fn main() {
     // Parses the attributes (CLAP)
     let matches = App::new("cargo-aoc")
-        .version("0.2.0")
+        .version("0.3.0")
         .about("Cargo helper for Advent of Code")
         .author("gobanos <gregory.obanos@gmail.com>")
         .arg(Arg::with_name("dummy").hidden(true).possible_value("aoc"))
