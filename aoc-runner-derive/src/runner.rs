@@ -8,7 +8,7 @@ use quote::quote;
 use syn::*;
 
 pub fn runner_impl(args: pm::TokenStream, input: pm::TokenStream) -> pm::TokenStream {
-    let (day, part, alt, name) = utils::extract_meta(args);
+    let (day, part, raw_alt, name) = utils::extract_meta(args);
     let day = day
         .to_string()
         .parse()
@@ -18,14 +18,17 @@ pub fn runner_impl(args: pm::TokenStream, input: pm::TokenStream) -> pm::TokenSt
         .to_string()
         .parse()
         .expect("runners must have a defined part");
-    let alt = alt
-        .map(|i| {
-            i.to_string()
-                .parse()
-                .expect("couldn't parse runner alternative")
-        })
-        .unwrap_or(Alternative::Default);
+    let alt = raw_alt
+        .clone()
+        .map(|i| i.to_string().parse())
+        .unwrap_or(Ok(Alternative::Default));
     let name = name.map(|i| i.to_string());
+    let (alt, name) = match (alt, name) {
+        (Ok(alt), Some(name)) => (alt, Some(name)),
+        (Ok(alt), None) => (alt, None),
+        (Err(e), Some(_)) => panic!("couldn't parse runner alternative: {}", e),
+        (Err(_), None) => (Alternative::Default, raw_alt.map(|i| i.to_string())),
+    };
 
     let dp = DayPart {
         day,
